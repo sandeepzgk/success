@@ -4,12 +4,12 @@ on: push
 
 jobs:
   release:
-    runs-on: [windows-latest]
+    runs-on: [windows-latest, ubuntu-latest]
     permissions:
       contents: write
     strategy:
       matrix:
-        os: [windows-latest]
+        os:  [windows-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
