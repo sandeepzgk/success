@@ -5,14 +5,14 @@ on: push
 jobs:
   create_release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Get Build Number
         id: build_number
         uses: einaregilsson/build-number@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.1.4
@@ -57,7 +57,24 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # ... (asset finding steps remain the same)
+      - name: Find .deb Asset
+        if: matrix.os == 'ubuntu-latest'
+        id: find_deb_asset
+        run: |
+          DEB_FILE=$(find ./dist -name "*.deb" -type f -print -quit)
+          echo "::set-output name=deb_file::$DEB_FILE"
+      - name: Find .snap Asset
+        if: matrix.os == 'ubuntu-latest'
+        id: find_snap_asset
+        run: |
+          SNAP_FILE=$(find ./dist -name "*.snap" -type f -print -quit)
+          echo "::set-output name=snap_file::$SNAP_FILE"
+      - name: Find .AppImage Asset
+        if: matrix.os == 'ubuntu-latest'
+        id: find_appimage_asset
+        run: |
+          APPIMAGE_FILE=$(find ./dist -name "*.AppImage" -type f -print -quit)
+          echo "::set-output name=appimage_file::$APPIMAGE_FILE"
       - name: Upload .deb Asset
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-release-asset@v1
@@ -74,7 +91,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ${{ steps.find_snap_asset.outputs.snap_file }}
           asset_name: ${{ steps.find_snap_asset.outputs.snap_file }}
           asset_content_type: application/octet-stream
@@ -84,7 +101,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ${{ steps.find_appimage_asset.outputs.appimage_file }}
           asset_name: ${{ steps.find_appimage_asset.outputs.appimage_file }}
           asset_content_type: application/octet-stream
@@ -106,7 +123,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ${{ env.EXE_FILE }}
           asset_name: ${{ github.event.repository.name }}-setup-${{ steps.build_number.outputs.build_number }}.exe
           asset_content_type: application/octet-stream
@@ -116,7 +133,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ${{ env.MSI_FILE }}
           asset_name: ${{ github.event.repository.name }}-setup-${{ steps.build_number.outputs.build_number }}.msi
           asset_content_type: application/octet-stream
