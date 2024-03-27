@@ -17,7 +17,6 @@ jobs:
         with:
           node-version: '21.7.1'
       - name: Get Build Number
-        if: matrix.os == 'ubuntu-latest'
         id: build_number
         uses: einaregilsson/build-number@v3
         with:
@@ -32,8 +31,7 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create Release
-        if: matrix.os == 'ubuntu-latest'
+      - name: Create Release        
         id: create_release
         uses: actions/create-release@v1.1.4
         env:
