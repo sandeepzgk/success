@@ -118,7 +118,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ env.EXE_FILE }}
-          asset_name: ${{ steps.find_exe_asset.outputs.exe_file }}
+          asset_name: ${{ github.event.repository.name }}-setup-${{ steps.build_number.outputs.build_number }}.exe
           asset_content_type: application/octet-stream
       - name: Upload .msi Asset
         if: matrix.os == 'windows-latest'
@@ -128,5 +128,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ env.MSI_FILE }}
-          asset_name: ${{ steps.find_msi_asset.outputs.msi_file }}
+          asset_name: ${{ github.event.repository.name }}-setup-${{ steps.build_number.outputs.build_number }}.msi
           asset_content_type: application/octet-stream
