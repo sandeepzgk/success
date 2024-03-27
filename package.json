@@ -1,7 +1,7 @@
 {
   "name": "HapticsFlow",
   "version": "0.1.1",
-  "description": "An easy to use vibrotactile editor software.",
+  "description": "An easy to use vibrotactile haptics editor software.",
   "private": true,
   "main": "app/electron/main.js",
   "scripts": {
