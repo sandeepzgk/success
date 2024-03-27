@@ -1,0 +1,7 @@
+
+steps:
+- name: Get Build Number
+    id: build_number
+    uses: einaregilsson/build-number@v3
+    with:
+        token: ${{ secrets.GITHUB_TOKEN }}

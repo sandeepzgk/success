@@ -1,0 +1,19 @@
+name: Build/release
+
+on: push
+
+jobs:
+  release:
+    runs-on: self-hosted
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 21.7.1
+      - uses: ./.github/workflows/build-number.yml
+      - uses: ./.github/workflows/linux-steps.yml
