@@ -9,7 +9,7 @@ jobs:
       contents: write
     strategy:
       matrix:
-        os:  [windows-latest, ubuntu-latest]
+        os:  [windows-latest, ubuntu-latest] #, macos-latest]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
