@@ -1,16 +1,15 @@
 name: Build/release
 
-on:
-  push
+on: push
 
 jobs:
   release:
-    runs-on: self-hosted
+    runs-on: [windows-latest]
     permissions:
       contents: write
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [windows-latest]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -31,7 +30,17 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create Release        
+      - name: Windows Release
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "Running Windows specific steps"
+          npm i
+          npx update-browserslist-db@latest
+          npm run dist-windows
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
         id: create_release
         uses: actions/create-release@v1.1.4
         env:
@@ -88,4 +97,36 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.find_appimage_asset.outputs.appimage_file }}
           asset_name: ${{ steps.find_appimage_asset.outputs.appimage_file }}
+          asset_content_type: application/octet-stream
+      - name: Find .exe Asset
+        if: matrix.os == 'windows-latest'
+        id: find_exe_asset
+        run: |
+          EXE_FILE=$(find ./dist -name "*.exe" -type f -print -quit)
+          echo "::set-output name=exe_file::$EXE_FILE"
+      - name: Find .msi Asset
+        if: matrix.os == 'windows-latest'
+        id: find_msi_asset
+        run: |
+          MSI_FILE=$(find ./dist -name "*.msi" -type f -print -quit)
+          echo "::set-output name=msi_file::$MSI_FILE"
+      - name: Upload .exe Asset
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.find_exe_asset.outputs.exe_file }}
+          asset_name: ${{ steps.find_exe_asset.outputs.exe_file }}
+          asset_content_type: application/octet-stream
+      - name: Upload .msi Asset
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.find_msi_asset.outputs.msi_file }}
+          asset_name: ${{ steps.find_msi_asset.outputs.msi_file }}
           asset_content_type: application/octet-stream
