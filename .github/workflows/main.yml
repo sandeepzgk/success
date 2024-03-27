@@ -13,6 +13,8 @@ jobs:
       - name: Get Build Number
         id: build_number
         uses: einaregilsson/build-number@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.1.4
