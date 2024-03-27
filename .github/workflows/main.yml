@@ -4,7 +4,7 @@ on: push
 
 jobs:
   release:
-    runs-on: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
     strategy:
