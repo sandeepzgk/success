@@ -103,11 +103,13 @@ jobs:
         id: find_exe_asset
         run: |
           $EXE_FILE = (Get-ChildItem -Path "./dist" -Filter "*.exe" -Recurse | Select-Object -First 1).FullName
+          echo "EXE_FILE=$EXE_FILE" >> $env:GITHUB_ENV
       - name: Find .msi Asset
         if: matrix.os == 'windows-latest'
         id: find_msi_asset
         run: |
           $MSI_FILE = (Get-ChildItem -Path "./dist" -Filter "*.msi" -Recurse | Select-Object -First 1).FullName
+          echo "MSI_FILE=$MSI_FILE" >> $env:GITHUB_ENV
       - name: Upload .exe Asset
         if: matrix.os == 'windows-latest'
         uses: actions/upload-release-asset@v1
@@ -115,7 +117,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_exe_asset.outputs.exe_file }}
+          asset_path: ${{ env.EXE_FILE }}
           asset_name: ${{ steps.find_exe_asset.outputs.exe_file }}
           asset_content_type: application/octet-stream
       - name: Upload .msi Asset
@@ -125,6 +127,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_msi_asset.outputs.msi_file }}
+          asset_path: ${{ env.MSI_FILE }}
           asset_name: ${{ steps.find_msi_asset.outputs.msi_file }}
           asset_content_type: application/octet-stream
