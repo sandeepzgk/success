@@ -18,22 +18,21 @@ jobs:
           node-version: 21.7.1
                 
       - if: matrix.os == 'ubuntu-latest'
-      run: |
-        echo "Running Linux specific steps"
-        npm i
-        npx update-browserslist-db@latest
-        npm audit fix --force
-        if [ $? -ne 0 ]; then
-          echo "npm audit fix --force failed. Trying manual updates..."
-          # Manually update dependencies in package.json
-          npm install
-          # Resolve any compatibility issues or make necessary code changes
-        fi
-        npm run dist-linux
-        echo "APPIMAGE_FILE=$(ls dist/*.AppImage)" >> $GITHUB_ENV
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}     
+        run: |
+          echo "Running Linux specific steps"
+          npm i
+          npx update-browserslist-db@latest
+          npm audit fix --force
+          if [ $? -ne 0 ]; then
+            echo "npm audit fix --force failed. Trying manual updates..."
+            # Manually update dependencies in package.json
+            npm install
+            # Resolve any compatibility issues or make necessary code changes
+          fi
+          npm run dist-linux
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
       
       
       - name: Get Build Number
