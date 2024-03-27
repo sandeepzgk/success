@@ -5,6 +5,9 @@
   "private": true,
   "main": "app/electron/main.js",
   "scripts": {
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "build:windows": "electron-builder --windows",
     "postinstall": "electron-builder install-app-deps",
     "audit-app": "npx electronegativity -i ./ -x LimitNavigationGlobalCheck,PermissionRequestHandlerGlobalCheck",
     "translate": "node ./app/localization/translateMissing.js",
