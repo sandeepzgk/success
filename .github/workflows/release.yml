@@ -21,9 +21,13 @@ jobs:
         run: |
           echo "Running Linux specific steps"
           npm i
+          npx update-browserslist-db@latest
+          npm audit fix
           npm run dist-linux
           echo "APPIMAGE_FILE=$(ls dist/*.AppImage)" >> $GITHUB_ENV
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
       
       
       - name: Get Build Number
