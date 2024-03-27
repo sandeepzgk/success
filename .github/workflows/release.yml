@@ -1,7 +1,6 @@
 name: Build/release
 
-on:
-  push
+on: push
 
 jobs:
   release:
@@ -11,11 +10,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 21.7.1
+
       - if: matrix.os == 'ubuntu-latest'
         run: |
           echo "Running Linux specific steps"
@@ -25,12 +26,14 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Get Build Number
         if: matrix.os == 'ubuntu-latest'
         id: build_number
         uses: einaregilsson/build-number@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         if: matrix.os == 'ubuntu-latest'
         id: create_release
@@ -42,48 +45,23 @@ jobs:
           release_name: Release-${{ steps.build_number.outputs.build_number }}
           draft: false
           prerelease: false
-      - name: Find .deb Asset
+
+      - name: Find and Upload Assets
         if: matrix.os == 'ubuntu-latest'
-        id: find_deb_asset
-        run: |
-          DEB_FILE=$(find ./dist -name "*.deb" -type f -print -quit)
-          echo "::set-output name=deb_file::$DEB_FILE"
-      - name: Find .snap Asset
-        if: matrix.os == 'ubuntu-latest'
-        id: find_snap_asset
-        run: |
-          SNAP_FILE=$(find ./dist -name "*.snap" -type f -print -quit)
-          echo "::set-output name=snap_file::$SNAP_FILE"
-      - name: Find .AppImage Asset
-        if: matrix.os == 'ubuntu-latest'
-        id: find_appimage_asset
-        run: |
-          APPIMAGE_FILE=$(find ./dist -name "*.AppImage" -type f -print -quit)
-          echo "::set-output name=appimage_file::$APPIMAGE_FILE"
-      - name: Upload .deb Asset
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_deb_asset.outputs.deb_file }}
-          asset_name: ${{ steps.find_deb_asset.outputs.deb_file }}
-          asset_content_type: application/vnd.debian.binary-package
-      - name: Upload .snap Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_snap_asset.outputs.snap_file }}
-          asset_name: ${{ steps.find_snap_asset.outputs.snap_file }}
-          asset_content_type: application/octet-stream
-      - name: Upload .AppImage Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_appimage_asset.outputs.appimage_file }}
-          asset_name: ${{ steps.find_appimage_asset.outputs.appimage_file }}
-          asset_content_type: application/octet-stream
+        run: |
+          declare -A asset_types=(
+            ["deb"]="application/vnd.debian.binary-package"
+            ["snap"]="application/octet-stream"
+            ["AppImage"]="application/octet-stream"
+          )
+
+          for asset_type in "${!asset_types[@]}"; do
+            asset_file=$(find ./dist -name "*.$asset_type" -type f -print -quit)
+            if [ -n "$asset_file" ]; then
+              asset_name=$(basename "$asset_file")
+              echo "Uploading $asset_name"
+              gh release upload ${{ steps.create_release.outputs.id }} "$asset_file" --name "$asset_name" --content-type "${asset_types[$asset_type]}"
+            fi
+          done
