@@ -1,5 +1,5 @@
 {
-  "name": "HapticsFlow",
+  "name": "success",
   "version": "0.1.1",
   "description": "An easy to use vibrotactile haptics editor software.",
   "private": true,
@@ -24,8 +24,8 @@
     "test": "mocha"
   },
   "build": {
-    "productName": "YourProductName",
-    "appId": "com.yourcompany|electron.yourproductname",
+    "productName": "success",
+    "appId": "com.sandeepzgk.success",
     "directories": {
       "buildResources": "resources"
     },
@@ -56,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sandeepzgk/hapticsflow.git"
+    "url": "git+https://github.com/sandeepzgk/success.git"
   },
   "keywords": [
     "electron",
@@ -76,9 +76,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sandeepzgk/hapticsflow/issues"
+    "url": "https://github.com/sandeepzgk/success/issues"
   },
-  "homepage": "https://github.com/sandeepzgk/hapticsflow#readme",
+  "homepage": "https://github.com/sandeepzgk/success#readme",
   "browserslist": [
     "last 2 Chrome versions"
   ],
